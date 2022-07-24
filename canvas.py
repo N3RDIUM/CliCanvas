@@ -14,7 +14,7 @@ class Canvas:
         
         # Draw lines
         for line in self.lines:
-            shape = [(line.x1, line.y1), (line.x2, line.y2)]
+            shape = [(line.x1, line.y1/2), (line.x2, line.y2/2)]
             ImageDraw.Draw(canvas_image).line(shape, fill=line.color)
 
         canvas_image = canvas_image.resize((width, height), Image.ANTIALIAS)
