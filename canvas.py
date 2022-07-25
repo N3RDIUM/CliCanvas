@@ -1,4 +1,6 @@
+import curses
 import characters
+import colors
 from PIL import Image, ImageDraw
 import numpy as np
 
@@ -19,11 +21,23 @@ class Canvas:
 
         canvas_image = canvas_image.resize((width, height), Image.ANTIALIAS)
 
-        canvas_string = ""
-        for y in range(height):
-            for x in range(width):
-                canvas_string += characters.convert_value(canvas_image.getpixel((x, y)))
-            canvas_string += "\n"
+        canvas_string = []
+        for pixel in range(len(canvas_image.getdata()) - 1):
+            _pixel = canvas_image.getdata()[pixel]
+            if _pixel > 0 and pixel < (255/3)*1:
+                _ = curses.A_DIM
+            elif _pixel > (255/3)*1 and pixel < (255/3)*2:
+                _ = curses.A_NORMAL
+            elif _pixel > (255/3)*2 and pixel < 255:
+                _ = curses.A_BOLD
+            else:
+                _ = curses.A_NORMAL
+            
+            # get character position
+            x = pixel % width
+            y = int(pixel / width)
+
+            canvas_string.append((characters.convert_value(_pixel), colors.convert_color('white', 'black'), _, (x, y)))
 
         return canvas_string
 

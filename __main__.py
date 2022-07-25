@@ -1,6 +1,5 @@
-from curses import wrapper
 import curses
-import datetime
+import colors
 import canvas
 import traceback
 import random
@@ -19,14 +18,14 @@ lines = [     # x1    y1   x2    y2        color
 def randomise(scr):
     quad_verts = [
         random.randint(0, scr.getmaxyx()[1]-1),
-        random.randint(0, scr.getmaxyx()[0]-1),
+        random.randint(0, scr.getmaxyx()[0]-1)*2,
         random.randint(0, scr.getmaxyx()[1]-1),
-        random.randint(0, scr.getmaxyx()[0]-1),
+        random.randint(0, scr.getmaxyx()[0]-1)*2,
 
         random.randint(0, scr.getmaxyx()[1]-1),
-        random.randint(0, scr.getmaxyx()[0]-1),
+        random.randint(0, scr.getmaxyx()[0]-1)*2,
         random.randint(0, scr.getmaxyx()[1]-1),
-        random.randint(0, scr.getmaxyx()[0]-1),
+        random.randint(0, scr.getmaxyx()[0]-1)*2,
     ]
 
     lines[0].x1 = quad_verts[0]
@@ -55,16 +54,19 @@ def randomise(scr):
 for i in lines:
     _canvas.add_line(i)
 
-def schermo(scr, *args):
+def main(scr, *args):
     try:
+        colors.define_colors()
         ch = ''
         stdscr = curses.initscr()
         curses.cbreak()
         stdscr.timeout(100)
         while ch != ord('q'):
+            stdscr.clear()
             randomise(stdscr)
-            stdscr.addstr(0, 0, f"{datetime.datetime.now()}")
-            stdscr.addstr(0, 0, _canvas.ret(scr.getmaxyx()[1]-1, scr.getmaxyx()[0]-1))
+            _ = _canvas.ret(scr.getmaxyx()[1], scr.getmaxyx()[0]-1)
+            for i in _:
+                scr.addch(i[3][1], i[3][0], i[0], i[1]|i[2])
             stdscr.clrtobot()
             ch = stdscr.getch()
             time.sleep(1)
@@ -75,4 +77,4 @@ def schermo(scr, *args):
         curses.endwin()
 
 
-curses.wrapper(schermo)
+curses.wrapper(main)
